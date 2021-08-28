@@ -3,5 +3,4 @@
 #### The following are C++ Classes:
 - Vector3D
 - Matrix3D
-- Quaternions
 
