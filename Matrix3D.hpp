@@ -25,4 +25,7 @@ public:
 Matrix3D operator*(const Matrix3D&, const Matrix3D&);
 Vector3D operator*(const Matrix3D&, const Vector3D&);
 
+float Determinant(const Matrix3D&);
+Matrix3D Inverse(const Matrix3D&);
+
 #endif

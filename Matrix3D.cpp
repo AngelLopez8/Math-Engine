@@ -57,6 +57,34 @@ Vector3D operator*(const Matrix3D& M, const Vector3D& v) {
     );
 }
 
+float Determinant(const Matrix3D& M) {
+    return (
+        (M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]))-
+        (M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0]))+
+        (M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]))
+    );
+}
+
+Matrix3D Inverse(const Matrix3D& M) {
+    const Vector3D a = M[0];
+    const Vector3D b = M[1];
+    const Vector3D c = M[2];
+
+    Vector3D r0 = Cross(b, c);
+    Vector3D r1 = Cross(c, a);
+    Vector3D r2 = Cross(a, b);
+
+    float invDet = 1.0F / Dot(r2, c);
+
+    return (
+        Matrix3D(
+            r0[0] * invDet, r0[1] * invDet, r0[2] * invDet,
+            r1[0] * invDet, r1[1] * invDet, r1[2] * invDet,
+            r2[0] * invDet, r2[1] * invDet, r2[2] * invDet
+        )
+    );
+}
+
 std::ostream& operator<<(std::ostream& out, const Matrix3D& M) {
     out << "|" << M[0][0] << " " << M[1][0] << " " << M[2][0] << "|" << "\n"
         << "|" << M[0][1] << " " << M[1][1] << " " << M[2][1] << "|" << "\n"

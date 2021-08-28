@@ -32,6 +32,8 @@ public:
     friend float Dot(const Vector3D&, const Vector3D&);;
     friend Vector3D Normalize(const Vector3D&);
     friend Vector3D Cross(const Vector3D&, const Vector3D&);
+    friend Vector3D Project(const Vector3D&, const Vector3D&);
+    friend Vector3D Reject(const Vector3D&, const Vector3D&);
 
     friend std::ostream& operator<<(std::ostream&, const Vector3D&);
 };
