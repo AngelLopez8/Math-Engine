@@ -10,7 +10,10 @@ public:
     // Constructors
     Vector3D() = default;
     Vector3D(float, float, float);
-    
+
+    // Vector3D(const Vector3D& V);
+    // Vector3D(Vector3D&&);
+
     // Overloaded Operators
     float& operator[](int);
     const float& operator[](int) const;

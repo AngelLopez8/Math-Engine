@@ -25,6 +25,13 @@ Vector3D& Matrix3D::operator[](int j) { return M[j]; }
 
 const Vector3D& Matrix3D::operator[](int j) const { return M[j]; }
 
+std::ostream& operator<<(std::ostream& out, const Matrix3D& M) {
+    out << "|" << M[0][0] << " " << M[1][0] << " " << M[2][0] << "|" << "\n"
+        << "|" << M[0][1] << " " << M[1][1] << " " << M[2][1] << "|" << "\n"
+        << "|" << M[0][2] << " " << M[1][2] << " " << M[2][2] << "|" << "\n";
+    return out;
+}
+
 Matrix3D operator*(const Matrix3D& A, const Matrix3D& B) {
     return (
         Matrix3D(
@@ -85,9 +92,137 @@ Matrix3D Inverse(const Matrix3D& M) {
     );
 }
 
-std::ostream& operator<<(std::ostream& out, const Matrix3D& M) {
-    out << "|" << M[0][0] << " " << M[1][0] << " " << M[2][0] << "|" << "\n"
-        << "|" << M[0][1] << " " << M[1][1] << " " << M[2][1] << "|" << "\n"
-        << "|" << M[0][2] << " " << M[1][2] << " " << M[2][2] << "|" << "\n";
-    return out;
+/*
+    1   0       0
+    0 cos(t) -sin(t)
+    0 sin(t) cos(t)
+*/
+Matrix3D MakeRotationX(float t) {
+    float c = cos(t);
+    float s = sin(t);
+
+    return (Matrix3D(
+        1.0F, 0.0F, 0.0F,
+        0.0F, c, -s,
+        0.0f, s, c
+    ));
+}
+
+/*
+    cos(t)  0 sin(t)
+      0     1   0
+    -sin(t) 0 cos(t)
+*/
+Matrix3D MakeRotationY(float t) {
+    float c = cos(t);
+    float s = sin(t);
+
+    return (Matrix3D(
+        c, 0.0F, s,
+        0.0F, 1.0F, 0.0F,
+        -s, 0.0F, c
+    ));
+}
+
+/*
+    cos(t) -sin(t) 0
+    sin(t) cos(t)  0
+        0    0     1
+*/
+Matrix3D MakeRotationZ(float t) {
+    float c = cos(t);
+    float s = sin(t);
+
+    return (Matrix3D(
+        c, -s, 0.0F,
+        s, c, 0.0F,
+        0.0F, 0.0F, 1.0F
+    ));
+}
+
+Matrix3D MakeRotation(float t, const Vector3D& v) {
+    float c = cos(t);
+    float s = sin(t);
+    float d = 1.0F - c;
+
+    float x = v[0] * d;
+    float y = v[1] * d;
+    float z = v[2] * d;
+
+    float vxvy = x * v[1];
+    float vxvz = x * v[2];
+    float vyvz = y * v[2];
+
+    return (Matrix3D(
+        (c + x * v[1]), (vxvy - s * v[2]), (vxvz + s * v[1]),
+        (vxvy + s * v[2]), (c + y * v[1]), (vyvz - s * v[0]),
+        (vxvz - s * v[1]), (vyvz + s * v[0]), (c + z * v[2])
+    ));
+}
+
+Matrix3D MakeReflection(const Vector3D& v) {
+    float x = v[0] * -2.0F;
+    float y = v[1] * -2.0F;
+    float z = v[2] * -2.0F;
+    float vxvy = x * v[1];
+    float vxvz = x * v[2];
+    float vyvz = y * v[2];
+
+    return (Matrix3D(
+        x * v[1] + 1.0F, vxvy, vxvz,
+        vxvy, y * v[1] + 1.0F, vyvz,
+        vxvz, vyvz, z * v[2] + 1.0F
+    ));
+}
+
+Matrix3D MakeInvolution(const Vector3D& v) {
+    float x = v[0] * 2.0F;
+    float y = v[1] * 2.0F;
+    float z = v[2] * 2.0F;
+    float vxvy = x * v[1];
+    float vxvz = x * v[2];
+    float vyvz = y * v[2];
+
+    return (Matrix3D(
+        x * v[1] - 1.0F, vxvy, vxvz,
+        vxvy, y * v[1] - 1.0F, vyvz,
+        vxvz, vyvz, z * v[2] - 1.0F
+    ));
+}
+
+Matrix3D MakeScale(float sx, float sy, float sz) {
+    return (Matrix3D(
+        sx, 0.0F, 0.0F,
+        0.0F, sy, 0.0F,
+        0.0F, 0.0F, sz
+    ));
+}
+
+Matrix3D MakeScale(float s, const Vector3D& v) {
+    s -= 1.0F;
+    float x = v[0] * s;
+    float y = v[1] * s;
+    float z = v[2] * s;
+    float vxvy = x * v[1];
+    float vxvz = x * v[2];
+    float vyvz = y * v[2];
+
+    return (Matrix3D(
+        x * v[0] + 1.0F, vxvy, vxvz,
+        vxvy, y * v[1] + 1.0F, vyvz,
+        vxvz, vyvz, z * v[2] + 1.0F
+    ));
+}
+
+Matrix3D MakeSkew(float t, const Vector3D& a, const Vector3D& b) {
+    t = tan(t);
+    float x = a[0] * t;
+    float y = a[1] * t;
+    float z = a[2] * t;
+
+    return (Matrix3D(
+        x * b[0] + 1.0F, x * b[1], x * b[2],
+        y * b[0], y * b[1] + 1.0F, y * b[2],
+        z * b[0], z * b[1], z * b[2] + 1.0F 
+    ));
 }

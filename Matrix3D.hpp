@@ -28,4 +28,14 @@ Vector3D operator*(const Matrix3D&, const Vector3D&);
 float Determinant(const Matrix3D&);
 Matrix3D Inverse(const Matrix3D&);
 
+Matrix3D MakeRotationX(float);
+Matrix3D MakeRotationY(float);
+Matrix3D MakeRotationZ(float);
+Matrix3D MakeRotation(float, const Vector3D&);
+Matrix3D MakeReflection(const Vector3D&);
+Matrix3D MakeInvolution(const Vector3D&);
+Matrix3D MakeScale(float, float, float);
+Matrix3D MakeScale(float, const Vector3D&);
+Matrix3D MakeSkew(float, const Vector3D&, const Vector3D&);
+
 #endif
