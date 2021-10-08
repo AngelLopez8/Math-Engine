@@ -1,4 +1,4 @@
-#include "Matrix3D.hpp"
+#include "../include/Matrix3D.hpp"
 
 Matrix3D::Matrix3D(float n00, float n01, float n02, float n10, float n11, float n12, float n20, float n21, float n22) {
     M[0] = Vector3D(n00, n10, n20);

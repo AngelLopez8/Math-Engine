@@ -1,9 +1,8 @@
 #include <iostream>
 
-#include "Matrix3D.hpp"
-#include "Vector3D.hpp"
+#include "lib/Matrix3D.cpp"
 
 int main() {
-    
+
     return 0;
 }

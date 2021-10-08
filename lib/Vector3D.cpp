@@ -1,4 +1,4 @@
-#include "Vector3D.hpp"
+#include "../include/Vector3D.hpp"
 
 Vector3D::Vector3D(float a, float b, float c) : x{a}, y{b}, z{c} {}
 
