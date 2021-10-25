@@ -1,89 +1,128 @@
-#include "../include/Vector3D.hpp"
+#include "../include/Vector3D.h"
 
-Vector3D::Vector3D(float a, float b, float c) : x{a}, y{b}, z{c} {}
+namespace A4DEngine {
+    // Constructor
+    Vector3D::Vector3D() : Vector3D{0.0, 0.0, 0.0} {}
 
-float& Vector3D::operator[](int i) { return ((&x)[i]);}
+    Vector3D::Vector3D(float aX, float aY, float aZ) {
+        x = aX;
+        y = aY;
+        z = aZ;
+    }
 
-const float& Vector3D::operator[](int i) const { return ((&x)[i]); }
+    // Copy Constructor
+    Vector3D::Vector3D(const Vector3D& a) : Vector3D{a.x, a.y, a.z} {}
 
-Vector3D& Vector3D::operator+=(const Vector3D& v) {
-    x += v.x;
-    y += v.y;
-    z += v.z;
-    return (*this);
-}
+    // Move Constructor
+    Vector3D::Vector3D(Vector3D&& a) : Vector3D{a.x, a.y, a.z} {}
 
-Vector3D& Vector3D::operator-=(const Vector3D& v) {
-    x -= v.x;
-    y -= v.y;
-    z -= v.z;
-    return (*this);
-}
+    // Destructor
+    Vector3D::~Vector3D() {}
 
-Vector3D& Vector3D::operator*=(float s) {
-    x *= s;
-    y *= s;
-    z *= s;
-    return (*this);
-}
+    // Scalar Multiplication: v *= s
+    Vector3D& Vector3D::operator*=(float s) {
+        x *= s;
+        y *= s;
+        z *= s;
+        return (*this); 
+    }
 
-Vector3D& Vector3D::operator/=(float s) {
-    s = 1.0F / s;
-    x *= s;
-    y *= s;
-    z *= s;
-    return (*this);
-}
+    // Scalar Division: v /= s
+    Vector3D& Vector3D::operator/=(float s) {
+        x /= s;
+        y /= s;
+        z /= s;
+        return (*this);    
+    }
 
-/*========Friend Functions========*/
-Vector3D operator+(const Vector3D& a, const Vector3D& b) {
-    return (Vector3D(a.x + b.x, a.y + b.y, a.z + b.z));
-}
+    // Vector Addition
+    Vector3D& Vector3D::operator+=(const Vector3D& a) {
+        x += a.x;
+        y += a.y;
+        z += a.z;
+        return (*this);
+    }
 
-Vector3D operator-(const Vector3D& a, const Vector3D& b) {
-    return (Vector3D(a.x - b.x, a.y - b.y, a.z - b.z));
-}
+    // Vector Subtraction
+    Vector3D& Vector3D::operator-=(const Vector3D& a) {
+        x -= a.x;
+        y -= a.y;
+        z -= a.z;
+        return (*this);
+    }
 
-Vector3D operator*(const Vector3D& v, float s) {
-    return (Vector3D(v.x * s, v.y * s, v.z * s));
-}
+    // returns Vector Magnitude
+    float Vector3D::get_magnitude() const {
+        return (sqrt(x*x + y*y + z*z));
+    }
 
-Vector3D operator/(const Vector3D& v, float s) {
-    s = 1.0F / s;
-    return (Vector3D(v.x * s, v.y * s, v.z * s));
-}
+    // returns Normalized Vector
+    Vector3D Vector3D::get_normalize_vector() const {
+        float magnitude = get_magnitude();
+        return (
+            Vector3D(
+                x/magnitude,
+                y/magnitude,
+                z/magnitude
+            )
+        );
+    }
 
-Vector3D operator-(const Vector3D& v) {
-    return (Vector3D(-v.x, -v.y, -v.z));
-}
+    // Sets Vector to Normalized Vector
+    Vector3D Vector3D::normalize_vector() {
+        Vector3D a = get_normalize_vector();
+        x = a.x;
+        y = a.y;
+        z = a.z;
+    }
 
-float Magnitude(const Vector3D& v) {
-    return (sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z)));
-}
+    // Print out Vector
+    void Vector3D::show(ostream& os) const {
+        os << x << " " << y << " " << z << "\n";
+    }
 
-float Dot(const Vector3D& a, const Vector3D& b) { return ((a.x * b.x) + (a.y * b.y) + (a.z * b.z)); }
+    // Scalar Multiplication
+    Vector3D operator*(const Vector3D& v, float s) {
+        return (
+            Vector3D(
+                v.x*s, v.y*s, v.z*s
+            )
+        );
+    }
 
-Vector3D Normalize(const Vector3D& v) { return (v / Magnitude(v)); }
+    // Scalar Division
+    Vector3D operator/(const Vector3D& v, float s) {
+        return (
+            Vector3D(
+                v.x/s, v.y/s, v.z/s
+            )
+        );
+    }
 
-Vector3D Cross(const Vector3D& a, const Vector3D& b) {
-    return (
-        Vector3D(
-            (a.y * b.z) - (a.z * b.y),
-            (a.z * b.x) - (a.x * b.z),
-            (a.x * b.y) - (a.y * b.x)
-        )
-    );
-}
+    // Negate Vector
+    Vector3D operator-(const Vector3D& v) {
+        return (
+            Vector3D(
+                -v.x, -v.y, -v.z
+            )
+        );
+    }
 
-Vector3D Project(const Vector3D& a, const Vector3D& b) {
-    return (b * (Dot(a, b) / Dot(b, b)));
-}
+    // Vector Addition
+    Vector3D operator+(const Vector3D& a, const Vector3D& b) {
+        return (
+            Vector3D(
+                a.x + b.x, a.y + b.y, a.z + b.z
+            )
+        );
+    }
 
-Vector3D Reject(const Vector3D& a, const Vector3D& b) {
-    return (a-Project(a, b));
-}
-
-std::ostream& operator<<(std::ostream& out, const Vector3D& v) {
-    out << v.x << "\n" << v.y << "\n" << v.z << "\n";
-    return out;
+    // Vector Subtraction
+    Vector3D operator-(const Vector3D& a, const Vector3D& b) {
+        return (
+            Vector3D(
+                a.x - b.x, a.y - b.y, a.z - b.z
+            )
+        );
+    }
 }

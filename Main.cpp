@@ -1,8 +1,13 @@
 #include <iostream>
 
-#include "lib/Matrix3D.cpp"
+#include "include/Vector3D.h"
+
+using std::cout;
+using std::endl;
 
 int main() {
+
+    
 
     return 0;
 }
