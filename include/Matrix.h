@@ -4,20 +4,23 @@
 #include <iostream>
 #include <cmath>
 
+#include "Vector3D.h"
+
 using std::ostream;
 
 namespace A4DEngine {
     class Matrix{
-        virtual ~Matrix() {}
+        public:
+            virtual ~Matrix() {}
 
-        // Print out Vector
-        virtual void show(ostream&) const = 0;
+            // Print out Vector
+            virtual void show(ostream&) const = 0;
 
-        // Overloaded cout
-        friend ostream& operator<<(ostream& os, const Matrix& M) {
-            M.show(os);
-            return os;
-        }
+            // Overloaded cout
+            friend ostream& operator<<(ostream& os, const Matrix& M) {
+                M.show(os);
+                return os;
+            }
     };
 }
 
