@@ -240,4 +240,108 @@ namespace A4DEngine {
 
         return InverseMatrix;
     }
+
+    // Make Rotation X
+    Matrix3D make_rotation_x(float t) {
+        return(
+            Matrix3D(
+                1.0, 0.0, 0.0,
+                0.0, cos(t), -sin(t),
+                0.0, sin(t), cos(t)
+            )
+        );
+    }
+
+    // Make Rotation Y
+    Matrix3D make_rotation_y(float t) {
+        return(
+            Matrix3D(
+                cos(t), 0.0, sin(t),
+                0.0, 1.0, 0.0,
+                -sin(t), 0.0, cos(t)
+            )
+        );
+    }
+
+    // Make Rotation Z
+    Matrix3D make_rotation_z(float t) {
+        return(
+            Matrix3D(
+                cos(t), -sin(t), 0.0,
+                sin(t), cos(t), 0.0, 
+                0.0, 0.0, 1.0
+            )
+        );
+    }
+
+    // Make Rotation
+    Matrix3D make_rotation(float t, const Vector3D& v) {
+        float c = cos(t);
+        float s = sin(t);
+        
+        return (
+            Matrix3D(
+                c + (1 - c)*(v.x*v.x), (1 - c)*v.x*v.y - s*v.z, (1 - c)*v.x*v.z + s*v.y,
+                (1 - c)*v.x*v.y + s*v.z, c + (1 - c)*(v.y*v.y), (1 - c)*v.y*v.z - s*v.x,
+                (1 - c)*v.x*v.z - s*v.y, (1 - c)*v.y*v.z + s*v.x, c + (1 - c)*(v.z*v.z)
+            )
+        );
+    }
+
+    // Make Reflection
+    Matrix3D make_reflection(const Vector3D& v) {
+        return (
+            Matrix3D(
+                1 - 2*(v.x*v.x), -2*v.x*v.y, -2*v.x*v.z,
+                -2*v.x*v.y, 1 - 2*(v.y*v.y), -2*v.y*v.z,
+                -2*v.x*v.z, -2*v.y*v.z, 1 - 2*(v.z*v.z)
+            )
+        );
+    }
+
+    // Make Involution
+    Matrix3D make_involution(const Vector3D& v) {
+        return (
+            Matrix3D(
+                2*(v.x*v.x) - 1, 2*v.x*v.y, 2*v.x*v.z,
+                2*v.x*v.y, 2*(v.y*v.y) - 1, 2*v.y*v.z,
+                2*v.x*v.z, 2*v.y*v.z, 2*(v.z*v.z) - 1
+            )
+        );
+    }
+
+    // Make Scale
+    Matrix3D make_scale(float sx, float sy, float sz) {
+        return (
+            Matrix3D(
+                sx, 0.0, 0.0,
+                0.0, sy, 0.0,
+                0.0, 0.0, sz
+            )
+        );
+    }
+
+    // Make Scale
+    Matrix3D make_scale(float s, const Vector3D& v) {
+        return (
+            Matrix3D(
+                (s - 1)*(v.x*v.x) + 1, (s - 1)*v.x*v.y, (s - 1)*v.x*v.z,
+                (s - 1)*v.x*v.y, (s - 1)*(v.y*v.y) + 1, (s - 1)*v.y*v.z,
+                (s - 1)*v.x*v.z, (s - 1)*v.y*v.z, (s - 1)*(v.z*v.z) + 1
+            )
+        );
+    }
+
+    // Make Skew
+    Matrix3D make_skew(float t, const Vector3D& a, const Vector3D& b) {
+        t = tan(t);
+
+        return (
+            Matrix3D(
+                a.x*b.x*t + 1, a.x*b.y*t, a.x*b.z*t,
+                a.y*b.x*t, a.y*b.y*t + 1, a.y*b.z*t,
+                a.z*b.x*t, a.z*b.y*t, a.z*b.z*t + 1
+            )
+        );
+    }
 }

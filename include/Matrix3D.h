@@ -78,6 +78,33 @@ namespace A4DEngine {
 
     // Returns Inverse Matrix
     Matrix3D get_inverse(const Matrix3D&);
+
+    // Make Rotation X
+    Matrix3D make_rotation_x(float);
+
+    // Make Rotation Y
+    Matrix3D make_rotation_y(float);
+
+    // Make Rotation Z
+    Matrix3D make_rotation_z(float);
+
+    // Make Rotation
+    Matrix3D make_rotation(float, const Vector3D&);
+
+    // Make Reflection
+    Matrix3D make_reflection(const Vector3D&);
+
+    // Make Involution
+    Matrix3D make_involution(const Vector3D&);
+
+    // Make Scale
+    Matrix3D make_scale(float, float, float);
+
+    // Make Scale
+    Matrix3D make_scale(float, const Vector3D&);
+
+    // Make Skew
+    Matrix3D make_skew(float, const Vector3D&, const Vector3D&);
 }
 
 #endif

@@ -13,7 +13,7 @@ int main() {
     
     A4DEngine::Matrix3D M{v1, v2, v3};
 
-    cout << get_adjugate(M); 
+    cout << get_adjugate(M);  
     cout << get_inverse(M); 
     
   
