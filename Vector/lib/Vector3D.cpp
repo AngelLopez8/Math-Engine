@@ -1,19 +1,23 @@
 #include "../include/Vector3D.h"
 
 namespace AMathEngine {
-    // Default Constructor
+    /* Default Constructor */
     Vector3D::Vector3D() {
         vec = {0.0f, 0.0f, 0.0f};
         length = 3;
     }
 
-    // Copy Constructor
+    /* Copy Constructor 
+     * @param Vector Object
+    */
     Vector3D::Vector3D(const Vector3D& a) {
         vec = a.vec;
         length = a.length;
     }
 
-    // Move Constructor
+    /* Move Constructor 
+     * @param Vector Object
+    */
     Vector3D::Vector3D(Vector3D&& a) {
         vec = a.vec;
         length = a.length;
@@ -22,22 +26,30 @@ namespace AMathEngine {
         a.length = 0;
     }
 
-    // Constructor passed in 3 floats
+    /* Constructor
+     * @param 3 float values
+    */
     Vector3D::Vector3D(float x, float y, float z) {
         vec = {x, y, z};
         length = 3;
     }
 
-    // Constructor passed in vector
+    /* Constructor
+     * @param vector of floats
+    */
     Vector3D::Vector3D(vector<float> a) {
         vec = a;
         length = 3;
     }
 
-    // Destructor
+    /* Destructor */
     Vector3D::~Vector3D() {}
 
-    // Cross Product
+    /* Cross Product
+     * Returns a Perpendicular Vector to the two Vectors
+     * @param Vector Object, Vector Object
+     * @return new Vector Object
+    */
     Vector3D cross(const Vector3D& a, const Vector3D& b) {
         return (
             Vector3D(
@@ -48,7 +60,11 @@ namespace AMathEngine {
         );
     }
 
-    // Scalar Triple Product
+    /* Scalar Triple Product 
+     * Used to find the volume of a parallelepiped
+     * @param Vector Object, Vector Object, Vector Object
+     * @return 
+    */
     float scalar_triple_product(const Vector3D& a, const Vector3D& b, const Vector3D& c) {
         return (
             dot(a, cross(b, c))

@@ -25,7 +25,7 @@ namespace AMathEngine {
             ~Vector();              // Destructor
 
             Vector& operator=(const Vector&);   // Copy assignment operator
-            Vector& operator=(Vector&&); // Move Assignment Operator
+            Vector& operator=(Vector&&);    // Move Assignment Operator
             
             Vector& operator*=(float);     // Vector Scalar Multiplication
 
@@ -47,13 +47,15 @@ namespace AMathEngine {
             }
     };
 
-    Vector operator*(const Vector&, float);             // Vector Scalar Multiplication
+    Vector operator*(const Vector&, float);     // Vector Scalar Multiplication
     Vector operator+(const Vector&, const Vector&);     // Vector Addition
     Vector operator-(const Vector&, const Vector&);     // Vector Subtraction
 
     float dot(const Vector&, const Vector&);    // Dot Product
-    float magnitude(const Vector&);             // Vector Magnitude
-    float find_angle(const Vector&, const Vector&);  // returns angle between vectors
+    float magnitude(const Vector&);     // Vector Magnitude
+    float find_angle(const Vector&, const Vector&);     // returns angle between vectors
+
+    Vector normalize(const Vector&);    // Normalize Vector
 }
 
 #endif
