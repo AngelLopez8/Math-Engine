@@ -1,56 +1,63 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include "../../Vector/include/Vector.h"
+#include <iostream>
 
 namespace AMathEngine {
-
+    template <class T>
     class Matrix {
         private:
-            vector<Vector> M;
-            int dimM, dimN;
+            T* matrixData;
+            int nRows, nCols, nElements;
         public:
-            Matrix();                   // Default Constructor
-            Matrix(const Matrix&);      // Copy Constructor
-            Matrix(Matrix&&);           // Move Constructor
-            Matrix(vector<Vector>);     // Constructor passed in vector
-            ~Matrix();                  // Destructor
+            /***************************** Constructors *****************************/
+            Matrix();   // Default Constructor
+            Matrix(int numRows, int numCols);   // Create empty matrix of numRows x numCols
+            Matrix(int numRows, int numCols, const T* inputData);   // Copy elements from array into new matrix of numRows x numCols
+            Matrix(const Matrix<T>& inputMatrix);   // Copy Constructor
+            Matrix(Matrix<T>&& inputMatrix);    // Move Constructor
 
-            Matrix& operator=(const Matrix&);   // Copy assignment operator
-            Matrix& operator=(Matrix&&);        // Move assignment operator
+            ~Matrix();// Destructor
 
-            // Subscript Operators
-            Vector& operator[](int);
-            const Vector& operator[](int) const;
+            /***************************** Configuration Methods *****************************/
+            bool resize(int numRows, int numCols);  // Change Matrix dimensions
 
-            int get_columns() const { return dimN; }  // returns # of column vectors
-            int get_rows() const { return dimM; }   // returns # of row vectors
-            void dimensions() const { std::cout << dimM << "x" << dimN << "\n"; }   // prints out matrix dimension
+            /***************************** Element Access Methods *****************************/
+            T get_element(int row, int col);
+            bool set_element(int row, int col, T elementValue);
+            int get_num_rows() const;
+            int get_num_cols() const;
 
-            // Overloaded Output Operator
-            friend ostream& operator<<(ostream& out, const Matrix& A) {
-                int rows = A.get_rows();
-                int cols = A.get_columns();
-
-                for (int i = 0; i < rows; i++) {
-                    for (int j = 0; j < cols; j++)
-                        out << A[j][i] << " ";
-                    out << "\n";
+            void print() {
+                for (int i = 0; i < nElements; i++) {
+                    if ((i+1)%nCols == 0) {
+                        std::cout << matrixData[i] << "\n";
+                    } else {
+                        std::cout << matrixData[i] << " ";
+                    }
                 }
-
-                return out;
             }
+
+            /***************************** Overloaded Operators *****************************/
+            bool operator==(const Matrix<T>& rhs);  // Overloaded == operator
+            // T& operator[](int index);   // Overloaded [] operator
+            // const T& operator[](int index); // Overloaed [] operator
+
+            /***************************** Overloaded +, -, and * operators (friends) *****************************/
+            template <class U> friend Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs);  // Matrix + Matrix
+            template <class U> friend Matrix<U> operator+(const U& lhs, const Matrix<U>& rhs);  // Scalar + Matrix
+            template <class U> friend Matrix<U> operator+(const Matrix<U>& lhs, const U& rhs);  // Matrix + Scalar
+
+            template <class U> friend Matrix<U> operator-(const Matrix<U>& lhs, const Matrix<U>& rhs);  // Matrix - Matrix
+            template <class U> friend Matrix<U> operator-(const U& lhs, const Matrix<U>& rhs);  // Scalar - Matrix
+            template <class U> friend Matrix<U> operator-(const Matrix<U>& lhs, const U& rhs);  // Matrix - Scalar
+
+            template <class U> friend Matrix<U> operator*(const Matrix<U>& lhs, const Matrix<U>& rhs);  // Matrix * Matrix
+            template <class U> friend Matrix<U> operator*(const U& lhs, const Matrix<U>& rhs);  // Scalar * Matrix
+            template <class U> friend Matrix<U> operator*(const Matrix<U>& lhs, const U& rhs);  // Matrix * Scalar
+        private:
+            int get_linear_index(int row, int col);
     };
-
-    Matrix operator*(const Matrix&, float); // Vector Scalar Multiplication
-    
-    Matrix operator+(const Matrix&, const Matrix&);     // Matrix Addition
-    Matrix operator-(const Matrix&, const Matrix&);     // Matrix Subtraction
-    Matrix operator*(const Matrix&, const Matrix&);     // Matrix Multiplication
-
-    Matrix transpose(const Matrix&);    // Matrix transpose
-    Matrix get_submatrix(const Matrix&, int);    // returns subMatrix
-    float determinant(const Matrix&);   // Matrix determinant
 }
 
 #endif

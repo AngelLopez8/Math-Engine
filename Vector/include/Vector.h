@@ -3,57 +3,64 @@
 
 #include <iostream>
 #include <math.h>
-#include <vector>
 
 # define M_PI   3.14159265358979323846  /* pi */
 
 using std::ostream;
-using std::vector;
 
 namespace AMathEngine {
+    template <class T>
     class Vector {
         protected:
-            vector<float> vec;
+            T* data;
             int length;
         public:
-            Vector();               // Default Constructor
-            Vector(const Vector&);  // Copy Constructor
-            Vector(Vector&&);       // Move Constructor
-            Vector(vector<float>);  // Constructor passed in array
-            ~Vector();              // Destructor
-
-            Vector& operator=(const Vector&);   // Copy assignment operator
-            Vector& operator=(Vector&&);    // Move Assignment Operator
+            /***************************** Constructors *****************************/
+            Vector();   // Default Constructor
+            Vector(int len);    // Empty Vector of given length
+            Vector(int len, const T* inputData);    // New Vector of given data
+            Vector(const Vector<T>& inputVector);   // Copy Constructor
+            Vector(Vector<T>&& inputVector);    // Move Constructor
             
-            Vector& operator*=(float);     // Vector Scalar Multiplication
+            ~Vector();  // Destructor
 
-            Vector& operator+=(const Vector&);     // Vector Addition
-            Vector& operator-=(const Vector&);     // Vector Subtraction
+            /***************************** Configuration Methods *****************************/
+            bool resize(int len);   // Change Vector length
+
+            /***************************** Element Access Methods *****************************/
+            int get_length() const;  // returns vector length
+
+            void print() const {
+                for (int i = 0; i < length; i++)
+                    std::cout << data[i] << " ";
+                std::cout << std::endl;
+            }
+
+            /***************************** Overloaded Operators *****************************/
+            Vector<T>& operator=(const Vector<T>&);     // Copy assignment operator
+            Vector<T>& operator=(Vector<T>&&);      // Move Assignment Operator
+            
+            Vector<T>& operator*=(float);   // Vector Scalar Multiplication
+
+            Vector<T>& operator+=(const Vector<T>&);    // Vector Addition
+            Vector<T>& operator-=(const Vector<T>&);    // Vector Subtraction
 
             // Subscript Operators
-            float& operator[](int); 
-            const float& operator[](int) const;
+            T& operator[](int); 
+            const T& operator[](int) const;
 
-            int get_length() const { return length; }   // returns vector length
+            /***************************** Overloaded Operators (friends) *****************************/
+            template <class U> friend Vector<U> operator*(const Vector<U>&, float);     // Vector Scalar Multiplication
+            template <class U> friend Vector<U> operator+(const Vector<U>&, const Vector<U>&);  // Vector Addition
+            template <class U> friend Vector<U> operator-(const Vector<U>&, const Vector<U>&);  // Vector Subtraction
 
-            // Overloaded Output Operator
-            friend ostream& operator<<(ostream& out, const Vector& a) {
-                for (int i = 0; i < a.length; i++) {
-                    out << a.vec[i] << "\n";
-                }
-                return out;
-            }
+            /***************************** Friend Functions *****************************/
+            template <class U> friend U dot(const Vector<U>&, const Vector<U>&);    // Dot Product
+            template <class U> friend U magnitude(const Vector<U>&);    // Vector Magnitude
+            template <class U> friend U find_angle(const Vector<U>&, const Vector<U>&);     // returns angle between vectors
+
+            template <class U> friend Vector<U> normalize(const Vector<U>&);    // Normalize Vector
     };
-
-    Vector operator*(const Vector&, float);     // Vector Scalar Multiplication
-    Vector operator+(const Vector&, const Vector&);     // Vector Addition
-    Vector operator-(const Vector&, const Vector&);     // Vector Subtraction
-
-    float dot(const Vector&, const Vector&);    // Dot Product
-    float magnitude(const Vector&);     // Vector Magnitude
-    float find_angle(const Vector&, const Vector&);     // returns angle between vectors
-
-    Vector normalize(const Vector&);    // Normalize Vector
 }
 
 #endif

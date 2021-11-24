@@ -4,18 +4,21 @@
 #include "Vector.h"
 
 namespace AMathEngine {
-    class Vector3D : public Vector { 
+    template <class T>
+    class Vector3D : public Vector<T> { 
         public:
-            Vector3D();     // Default Constructor
-            Vector3D(const Vector3D&);      // Copy Constructor
-            Vector3D(Vector3D&&);       // Move Constructor
+            /***************************** Constructors *****************************/
+            Vector3D();     // Default Constructor 
             Vector3D(float, float, float);  // Constructor passed in 3 floats
-            Vector3D(vector<float>);    // Constructor passed in vector
-            ~Vector3D();    // Destructor
-    };
+            Vector3D(const Vector3D<T>&);      // Copy Constructor
+            Vector3D(Vector3D<T>&&);       // Move Constructor
 
-    Vector3D cross(const Vector3D&, const Vector3D&);   // Cross Product
-    float scalar_triple_product(const Vector3D&, const Vector3D&, const Vector3D&);   // Scalar triple product
+            ~Vector3D();    // Destructor
+
+            /***************************** Friend Functions *****************************/
+            template <class U> friend Vector3D<U> cross(const Vector3D<U>&, const Vector3D<U>&);   // Cross Product
+            template <class U> friend float scalar_triple_product(const Vector3D<U>&, const Vector3D<U>&, const Vector3D<U>&);   // Scalar triple product
+    };
 }
 
 #endif
