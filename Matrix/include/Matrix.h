@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include "../../Vector/include/Vector.h"
+
 namespace AMathEngine {
     template <class T>
     class Matrix {
@@ -23,7 +25,7 @@ namespace AMathEngine {
             bool resize(int numRows, int numCols);  // Change Matrix dimensions
 
             /***************************** Element Access Methods *****************************/
-            T get_element(int row, int col);
+            T get_element(int row, int col) const;
             bool set_element(int row, int col, T elementValue);
             int get_num_rows() const;
             int get_num_cols() const;
@@ -40,9 +42,10 @@ namespace AMathEngine {
 
             /***************************** Overloaded Operators *****************************/
             bool operator==(const Matrix<T>& rhs);  // Overloaded == operator
-            // T& operator[](int index);   // Overloaded [] operator
-            // const T& operator[](int index); // Overloaed [] operator
-
+            
+            Matrix<T>& operator=(const Matrix<T>&);     // Copy assignment operator
+            Matrix<T>& operator=(Matrix<T>&&);      // Move Assignment Operator
+ 
             /***************************** Overloaded +, -, and * operators (friends) *****************************/
             template <class U> friend Matrix<U> operator+(const Matrix<U>& lhs, const Matrix<U>& rhs);  // Matrix + Matrix
             template <class U> friend Matrix<U> operator+(const U& lhs, const Matrix<U>& rhs);  // Scalar + Matrix
@@ -54,10 +57,29 @@ namespace AMathEngine {
 
             template <class U> friend Matrix<U> operator*(const Matrix<U>& lhs, const Matrix<U>& rhs);  // Matrix * Matrix
             template <class U> friend Matrix<U> operator*(const U& lhs, const Matrix<U>& rhs);  // Scalar * Matrix
-            template <class U> friend Matrix<U> operator*(const Matrix<U>& lhs, const U& rhs);  // Matrix * Scalar
+            template <class U> friend Matrix<U> operator*(const Matrix<U>& lhs, const U& rhs);  // Matrix * Scalar        
+
         private:
-            int get_linear_index(int row, int col);
+            int get_linear_index(int row, int col) const; // Calculate index with given row and col
+            bool is_square() const;   // Check if Square Matrix
     };
+
+    /***************************** Calculations/Artithmetic *****************************/
+    template <class T>
+    T determinant(const Matrix<T>& A);    // Calculate and return the determinant
+
+    template <class T>
+    Matrix<T> transpose(const Matrix<T>& A);    // Tranpose Matrix
+
+    /***************************** Helper Functions *****************************/
+    template <class T>
+    Vector<T> get_column_vector(const Matrix<T>& A, int column);  // return column vector at given column
+
+    template <class T>
+    Vector<T> get_row_vector(const Matrix<T>& A, int row);    // returns row vector at given row
+
+    template <class T>
+    Matrix<T> get_submatrix(const Matrix<T>& A, int index);   // returns submatrix from given index
 }
 
 #endif
