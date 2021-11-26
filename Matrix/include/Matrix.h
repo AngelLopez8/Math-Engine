@@ -24,6 +24,8 @@ namespace AMathEngine {
             /***************************** Configuration Methods *****************************/
             bool resize(int numRows, int numCols);  // Change Matrix dimensions
 
+            void set_to_identity(); // Set Matrix to Identity Matrix
+
             /***************************** Element Access Methods *****************************/
             T get_element(int row, int col) const;
             bool set_element(int row, int col, T elementValue);
@@ -70,6 +72,12 @@ namespace AMathEngine {
 
     template <class T>
     Matrix<T> transpose(const Matrix<T>& A);    // Tranpose Matrix
+
+    template <class T>
+    Matrix<T> adjacent(const Matrix<T>& A);     // Adjacent Matrix
+
+    template <class T>
+    Matrix<T> inverse(const Matrix<T>& A);      // Inverse Matrix
 
     /***************************** Helper Functions *****************************/
     template <class T>

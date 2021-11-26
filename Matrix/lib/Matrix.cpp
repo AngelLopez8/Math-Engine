@@ -42,7 +42,7 @@ namespace AMathEngine {
     }
 
     /* Copy Constructor
-     * @param
+     * @param Matrix Object
     */
     template <class T>
     Matrix<T>::Matrix(const Matrix<T>& inputMatrix) 
@@ -53,7 +53,7 @@ namespace AMathEngine {
     }
 
     /* Move Constructor
-     * @param
+     * @param Matrix Object
     */
     template <class T>
     Matrix<T>::Matrix(Matrix<T>&& inputMatrix) 
@@ -81,9 +81,9 @@ namespace AMathEngine {
     /******************************************************
                     Configuration Functions
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Resize Matrix to given dimensions
+     * @param number of rows, number of columns
+     * @return boolean result of resize
     */
     template <class T>
     bool Matrix<T>::resize(int numRows, int numCols) {
@@ -101,12 +101,26 @@ namespace AMathEngine {
         }
     }
 
+    /* Reset Matrix to Identity Matrix
+     * @param None
+     * @return None
+    */
+    template <class T>
+    void Matrix<T>::set_to_identity() {
+        for (int i = 0; i < nElements; i++) {
+            int currRow = (i/nCols);
+            int currCol = (i%nCols);
+            if (currRow == currCol) matrixData[i] = 1;
+            else matrixData[i] = 0;
+        }
+    }
+
     /******************************************************
                     Element Access Functions
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Access Element at Given Row and Column
+     * @param Row value, Column value
+     * @return value at given location
     */
     template <class T>
     T Matrix<T>::get_element(int row, int col) const{
@@ -117,9 +131,9 @@ namespace AMathEngine {
             return 0.0;
     }
 
-    /*
-     * @param
-     * @return
+    /* Set element at given row and column to given value
+     * @param Row value, Column Value, element value
+     * @return boolean result of set item
     */
     template <class T>
     bool Matrix<T>::set_element(int row, int col, T elementValue) {
@@ -132,16 +146,16 @@ namespace AMathEngine {
         }
     }
 
-    /*
-     * @param
-     * @return
+    /* Get Number of Rows
+     * @param None
+     * @return number of rows
     */
     template <class T>
     int Matrix<T>::get_num_rows() const { return nRows; }
 
-    /*
-     * @param
-     * @return
+    /* Get Number of Columns
+     * @param None
+     * @return number of columns
     */
     template <class T>
     int Matrix<T>::get_num_cols() const { return nCols; }
@@ -149,9 +163,9 @@ namespace AMathEngine {
     /******************************************************
                   Overloaded Operators Functions
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Overloaded (==) equal to Operator
+     * @param Matrix Object
+     * @return boolean result of Matrix compare
     */
     template <class T>
     bool Matrix<T>::operator==(const Matrix<T>& rhs) {
@@ -213,9 +227,9 @@ namespace AMathEngine {
     /******************************************************
                         The + Operator
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Matrix Addition: Matrix + Matrix
+     * @param Matrix Object, Matrix Object
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator+(const Matrix<T>& lhs, const Matrix<T>& rhs) {
@@ -231,9 +245,9 @@ namespace AMathEngine {
         return newMatrix;
     }
 
-    /*
-     * @param
-     * @return
+    /* Add scalar value to each Matrix Element: scalar + Matrix
+     * @param scalar value, Matrix Object
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator+(const T& lhs, const Matrix<T>& rhs) {
@@ -249,9 +263,9 @@ namespace AMathEngine {
         return newMatrix;
     }
 
-    /*
-     * @param
-     * @return
+    /* Add scalar value to each Matrix Element: Matrix + scalar
+     * @param Matrix Object, scalar value
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator+(const Matrix<T>& lhs, const T& rhs) {
@@ -270,9 +284,9 @@ namespace AMathEngine {
     /******************************************************
                         The - Operator
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Matrix Subtraction: Matrix - Matrix
+     * @param Matrix Object, Matrix Object
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator-(const Matrix<T>& lhs, const Matrix<T>& rhs) {
@@ -288,9 +302,9 @@ namespace AMathEngine {
         return newMatrix;
     }
 
-    /*
-     * @param
-     * @return
+    /* Subtract scalar value to each Matrix Element: scalar - Matrix
+     * @param Matrix Object, scalar value
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator-(const T& lhs, const Matrix<T>& rhs) {
@@ -306,9 +320,9 @@ namespace AMathEngine {
         return newMatrix;
     }
 
-    /*
-     * @param
-     * @return
+    /* Subtract scalar value to each Matrix Element: Matrix - scalar
+     * @param Matrix Object, scalar value
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator-(const Matrix<T>& lhs, const T& rhs) {
@@ -327,9 +341,9 @@ namespace AMathEngine {
     /******************************************************
                         The * Operator
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Matrix Multiplication: Matrix*Matrix
+     * @param Matrix Object, Matrix Object
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator*(const Matrix<T>& lhs, const Matrix<T>& rhs) {
@@ -375,9 +389,9 @@ namespace AMathEngine {
         }
     }
 
-    /*
-     * @param
-     * @return
+    /* Matrix & Scalar Multiplication: scalar*Matrix
+     * @param Scalar value, Matrix Object
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator*(const T& lhs, const Matrix<T>& rhs) {
@@ -393,9 +407,9 @@ namespace AMathEngine {
         return newMatrix;
     }
 
-    /*
-     * @param
-     * @return
+    /* Matrix & Scalar Multiplication: Matrix*scalar
+     * @param Matrix Object, Scalar value
+     * @return new Matrix Object
     */
     template <class T>
     Matrix<T> operator*(const Matrix<T>& lhs, const T& rhs) {
@@ -414,9 +428,9 @@ namespace AMathEngine {
     /******************************************************
                         Private Functions
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Calculate Linear Index with given row and column
+     * @param row value, column value
+     * @return linear index value
     */
     template <class T>
     int Matrix<T>::get_linear_index(int row, int col) const {
@@ -426,9 +440,9 @@ namespace AMathEngine {
             return -1;
     }
 
-    /*
-     * @param
-     * @return
+    /* Check if Matrix is a Square Matrix
+     * @param None
+     * @return boolean result
     */
     template <class T>
     bool Matrix<T>::is_square() const { return nRows == nCols; }
@@ -436,9 +450,9 @@ namespace AMathEngine {
     /******************************************************
                     Calculations/Artithmetic
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Calculate Determinant of Matrix
+     * @param Matrix Object
+     * @return determinant value
     */
     template <class T>
     T determinant(const Matrix<T>& A) {
@@ -462,9 +476,9 @@ namespace AMathEngine {
         return det;
     }
 
-    /*
-     * @param
-     * @return
+    /* Transpose Matrix
+     * @param Matrix Object
+     * @return Transpose Matrix
     */
     template <class T>
     Matrix<T> transpose(const Matrix<T>& A) {
@@ -486,12 +500,60 @@ namespace AMathEngine {
         );
     }
 
+    /* Adjacent Matrix
+     *  - Used to find Inverse Matrix
+     * @param Matrix Object
+     * @return Adjacent Matrix
+    */
+    template <class T>
+    Matrix<T> adjacent(const Matrix<T>& A) {
+        Matrix<T> AT = transpose(A);
+        int newRows = A.get_num_rows();
+        int newCols = A.get_num_cols();
+        int newElements = newRows*newCols;
+        T* newData = new T[newElements];
+
+        for (int i = 0; i < newElements; i++) {
+            Matrix<T> subMatrix = get_submatrix(A, i);
+            T det = determinant(subMatrix);
+            if (i%2 == 0) newData[i] = det;
+            else newData[i] = -1*det;
+        }
+
+        return (
+            Matrix<T>(
+                newRows, newCols, newData
+            )
+        );
+    }
+
+    /* Inverse Matrix
+     * @param Matrix Object
+     * @return Inverse Matrix
+    */
+    template <class T>
+    Matrix<T> inverse(const Matrix<T>& A) {
+        T det = determinant(A);
+        if (A.is_square() && det != 0)  {
+            Matrix<T> Adj = adjacent(A);
+            Matrix<T> Inv = (1/det)*Adj;
+
+            return (
+                Inv
+            );
+        } else {
+            return (
+                Matrix<T>(1)
+            );
+        }
+    }
+
     /******************************************************
                         Helper Functions
     ******************************************************/
-    /*
-     * @param
-     * @return
+    /* Return Vector with column vector values
+     * @param Matrix Object, column value
+     * @return Column Vector Object
     */
     template <class T>
     Vector<T> get_column_vector(Matrix<T>& A, int column) {
@@ -507,9 +569,9 @@ namespace AMathEngine {
         );
     }
 
-    /*
-     * @param
-     * @return
+    /* Return Vector with row vector value
+     * @param Matrix Object, row value
+     * @return Row Vector Object
     */
     template <class T>
     Vector<T> get_row_vector(Matrix<T>& A, int row) {
@@ -525,9 +587,10 @@ namespace AMathEngine {
         );
     }
 
-    /*
-     * @param
-     * @return
+    /* Return SubMatrix of Matrix with given index
+     *  - Used to calculate Determinant
+     * @param Matrix Object, index value
+     * @return SubMatrix
     */
     template <class T>
     Matrix<T> get_submatrix(const Matrix<T>& A, int index) {
