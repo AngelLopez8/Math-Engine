@@ -9,15 +9,15 @@ namespace AMathEngine {
         public:
             /***************************** Constructors *****************************/
             Vector3D();     // Default Constructor 
-            Vector3D(float, float, float);  // Constructor passed in 3 floats
-            Vector3D(const Vector3D<T>&);      // Copy Constructor
-            Vector3D(Vector3D<T>&&);       // Move Constructor
+            Vector3D(float x, float y, float z);  // Constructor passed in 3 floats
+            Vector3D(const Vector3D<T>& inputVector);      // Copy Constructor
+            Vector3D(Vector3D<T>&& inputVector);       // Move Constructor
 
             ~Vector3D();    // Destructor
 
             /***************************** Friend Functions *****************************/
-            template <class U> friend Vector3D<U> cross(const Vector3D<U>&, const Vector3D<U>&);   // Cross Product
-            template <class U> friend float scalar_triple_product(const Vector3D<U>&, const Vector3D<U>&, const Vector3D<U>&);   // Scalar triple product
+            template <class U> friend Vector3D<U> cross(const Vector3D<U>& lhs, const Vector3D<U>& rhs);   // Cross Product
+            template <class U> friend float scalar_triple_product(const Vector3D<U>&, const Vector3D<U>&, const Vector3D<U>&);   // Scalar Triple Product
     };
 }
 

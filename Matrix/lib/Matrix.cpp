@@ -47,9 +47,9 @@ namespace AMathEngine {
     template <class T>
     Matrix<T>::Matrix(const Matrix<T>& inputMatrix) 
         : nRows(inputMatrix.nRows), nCols(inputMatrix.nCols), nElements(inputMatrix.nElements) {
-        matrixData = new T[nElements];
-        for (int i = 0; i < nElements; i++)
-            matrixData[i] = inputMatrix.matrixData[i];
+        this->matrixData = new T[this->nElements];
+        for (int i = 0; i < this->nElements; i++)
+            this->matrixData[i] = inputMatrix.matrixData[i];
     }
 
     /* Move Constructor
@@ -58,9 +58,9 @@ namespace AMathEngine {
     template <class T>
     Matrix<T>::Matrix(Matrix<T>&& inputMatrix) 
         : nRows(inputMatrix.nRows), nCols(inputMatrix.nCols), nElements(inputMatrix.nElements) {
-        matrixData = new T[nElements];
-        for (int i = 0; i < nElements; i++)
-            matrixData[i] = inputMatrix.matrixData[i];
+        this->matrixData = new T[this->nElements];
+        for (int i = 0; i < this->nElements; i++)
+            this->matrixData[i] = inputMatrix.matrixData[i];
 
         delete[] inputMatrix.matrixData;
         inputMatrix.matrixData = nullptr;
@@ -87,6 +87,8 @@ namespace AMathEngine {
     */
     template <class T>
     bool Matrix<T>::resize(int numRows, int numCols) {
+        if ((numRow <= 0) || (numCols <= 0))
+            return false;
         nRows = numRows;
         nCols = numCols;
         nElements = nRows*nCols;
@@ -160,6 +162,232 @@ namespace AMathEngine {
     template <class T>
     int Matrix<T>::get_num_cols() const { return nCols; }
 
+    /* Get Column Vector
+     * @param column value
+     * @return Vector Object
+    */
+    template <class T>
+    Vector<T> Matrix<T>::get_column_vector(int column) const{
+        if ((column < 0) || (column >= nCols)) {
+            throw std::invalid_argument("Column out of range.");
+        }
+        Vector<T> colVector(nRows);
+
+        for (int i = 0; i < nRows; i++)
+            colVector[i] = get_element(i, column);
+        
+        return colVector;
+    }
+
+    /* Get Row Vector
+     * @param row value
+     * @return Vector Object
+    */
+    template <class T>
+    Vector<T> Matrix<T>::get_row_vector(int row) const {
+        if ((row < 0) || (row >= nRows)) {
+            throw std::invalid_argument("Row out of range.");
+        }
+        Vector<T> rowVector(nRows);
+
+        for (int i = 0; i < nRows; i++)
+            rowVector[i] = get_element(row, i);
+        
+        return rowVector;
+    }
+
+    /* Get SubMatrix
+     * @param row value, col value
+     * @return Matrix Object
+    */
+    template <class T>
+    Matrix<T> Matrix<T>::get_submatrix(int row, int col) const {
+        if ((row <= 0) || (row >= nRows) || (col <= 0) || (row >= nCols)) {
+            throw std::invalid_argument("Row/Column out of range.");
+        }
+        Matrix<T> subMatrix(nRows-1, nCols-1);
+
+        int count = 0;
+        for (int i = 0; i < nRows; i++) {
+            for (int j = 0; j < nCols; j++) {
+                if ((i != row) && (j != col)) {
+                    subMatrix.matrixData[count] = this->get_element(i, j);
+                    count++;
+                }
+            }
+        }
+
+        return subMatrix;
+    }
+
+    /******************************************************
+     *               Functions to Computate
+    ******************************************************/
+    /* Calculate Determinant
+     * @param None
+     * @return Determinant result
+    */
+    template <class T>
+    T Matrix<T>::determinant() const {
+        if (!is_square()) {
+            throw std::invalid_argument("Must be a Square Matrix (Number of Rows must equal Number of Columns).");
+        }
+
+        T det;
+
+        if (nRows == 2) {
+            det = (matrixData[0]*matrixData[3] - matrixData[1]*matrixData[2]);
+        } else {
+            T sum = static_cast<T>(0.0);
+            T sign = static_cast<T>(1.0);
+            for (int i = 0; i < nCols; i++) {
+                Matrix<T> subMatrix = this->get_submatrix(0, i);
+
+                sum += sign*this->get_element(0, i)*subMatrix.determinant();
+                sign = -sign;
+            }
+            det = sum;
+        }
+
+        return det;
+    }
+
+    /* Get transpose of current Matrix
+     * @param None
+     * @return Matrix Object
+    */
+    template <class T>
+    Matrix<T> Matrix<T>::transposed() const {
+        T* newData = new T[nElements];
+
+        for (int i = 0; i < nElements; i++) {
+            int currRow = (i/nRows);
+            int currCol = (i%nRows);
+
+            newData[i] = get_element(currCol, currRow);
+        }
+
+        Matrix<T> newMatrix(nCols, nRows, newData);
+        delete[] newData;
+
+        return (
+            newMatrix
+        );
+    }
+
+    /* Turn current Matrix to Tranpose of itself
+     * @param None
+     * @return None
+    */
+    template <class T>
+    void Matrix<T>::transpose() {
+        T* newData = new T[nElements];
+
+        for (int i = 0; i < nElements; i++) {
+            int currRow = (i/nRows);
+            int currCol = (i%nRows);
+
+            newData[i] = get_element(currCol, currRow);
+        }
+
+        for (int i = 0; i < nElements; i++) {
+            matrixData[i] = newData[i];
+        }
+        
+        delete[] newData;
+    }
+
+    /* Get Adjacency Matrix of current Matrix
+     * @param None
+     * @return Matrix Object
+    */
+    template <class T>
+    Matrix<T> Matrix<T>::adjacented() const {
+        if (!is_square()) {
+            throw std::invalid_argument("Must be a Square Matrix (Number of Rows must equal Number of Columns).");
+        }
+
+        if (nRows == 2) {
+            Matrix<T> Adj(2, 2);
+            T det = this->determinant();
+            det = 1.0/det;
+            Adj.matrixData[0] = matrixData[3];
+            Adj.matrixData[1] = -1*matrixData[1];
+            Adj.matrixData[2] = -1*matrixData[2];
+            Adj.matrixData[3] = matrixData[0];
+
+            return Adj;
+        }
+
+        Matrix<T> AT = transposed();
+        Matrix<T> newMatrix(nRows, nCols);
+
+        T sign = static_cast<T>(1.0);
+        for (int i = 0; i < nCols; i++) {
+            for (int j = 0; j < nRows; j++) { 
+                Matrix<T> subMatrix = AT.get_submatrix(i, j);
+                T det = subMatrix.determinant();
+                det = det*sign;
+                newMatrix.set_element(i, j, det);
+                sign = -sign;
+            }
+        }
+
+        return (
+            newMatrix
+        );
+    }
+
+    /* Turn current Matrix into Ajacency Matrix
+     * @param None
+     * @return None
+    */
+    template <class T>
+    void Matrix<T>::adjacent() {
+
+        Matrix<T> Adj = this->adjacented();
+
+        for (int i = 0; i < nElements; i++) {
+            matrixData[i] = Adj.matrixData[i];
+        }
+    }
+
+    /* Get inverse of current Matrix
+     * @param None
+     * @return Matrix Object
+    */
+    template <class T>
+    Matrix<T> Matrix<T>::inversed() const {
+        T det = determinant();
+        if (det == 0) {
+            throw std::invalid_argument("Determinant = 0, inverse matrix does not exist.");
+        }
+        det = static_cast<T>(1.0)/det;
+        Matrix<T> Inv = this->adjacented();
+
+        for (int i = 0; i < nElements; i++)
+            Inv.matrixData[i] = Inv.matrixData[i]*det;
+
+        return Inv;
+    }
+    
+    /* Turn current Matrix to inverse of itself
+     * @param None
+     * @return None
+    */
+    template <class T>
+    void Matrix<T>::inverse() {
+        T det = determinant();
+        if (det == 0) {
+            throw std::invalid_argument("Determinant = 0, inverse matrix does not exist.");
+        }
+        det = static_cast<T>(1.0)/det;
+        this->adjacent();
+
+        for (int i = 0; i < nElements; i++)
+            matrixData[i] = matrixData[i]*det;
+    }
+
     /******************************************************
                   Overloaded Operators Functions
     ******************************************************/
@@ -187,16 +415,16 @@ namespace AMathEngine {
      * @return Current Matrix Object
     */
     template <class T>
-    Matrix<T>& Matrix<T>::operator=(const Matrix<T>& A) {
-        if (this != &A)
+    Matrix<T>& Matrix<T>::operator=(const Matrix<T>& rhs) {
+        if (this != &rhs)
         {
-            nRows = A.nRows;
-            nCols = A.nCols;
-            nElements = nRows*nCols;
-            delete[] matrixData;
-            matrixData = new T[nElements];
-            for (int i = 0; i < nElements; i++)
-                matrixData[i] = A.matrixData[i];
+            this->nRows = rhs.nRows;
+            this->nCols = rhs.nCols;
+            this->nElements = this->nRows*this->nCols;
+            delete[] this->matrixData;
+            this->matrixData = new T[this->nElements];
+            for (int i = 0; i < this->nElements; i++)
+                this->matrixData[i] = rhs.matrixData[i];
       }
       return (*this);
     }
@@ -206,20 +434,20 @@ namespace AMathEngine {
      * @return Current Matrix Object
     */
     template <class T>
-    Matrix<T>& Matrix<T>::operator=(Matrix<T>&& A) {
-        if (this != &A)
+    Matrix<T>& Matrix<T>::operator=(Matrix<T>&& rhs) {
+        if (this != &rhs)
         {            
-            nRows = A.nRows;
-            nCols = A.nCols;
-            nElements = nRows*nCols;
-            delete[] matrixData;
-            matrixData = new T[nElements];
-            for (int i = 0; i < nElements; i++)
-                matrixData[i] = A.matrixData[i];
+            this->nRows = rhs.nRows;
+            this->nCols = rhs.nCols;
+            this->nElements = this->nRows*this->nCols;
+            delete[] this->matrixData;
+            this->matrixData = new T[this->nElements];
+            for (int i = 0; i < this->nElements; i++)
+                this->matrixData[i] = rhs.matrixData[i];
             
-            delete[] A.matrixData;
-            A.matrixData = nullptr;
-            A.nRows = 0; A.nCols = 0;
+            delete[] rhs.matrixData;
+            rhs.matrixData = nullptr;
+            rhs.nRows = 0; rhs.nCols = 0;
         }
         return (*this);
     }
@@ -233,15 +461,18 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> operator+(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-        int numRows = lhs.nRows;
-        int numCols = lhs.nCols;
-        int numElements = numRows*numCols;
-        T *tempData = new T[numElements];
-        for (int i = 0; i < numElements; i++)
-            tempData[i] = lhs.matrixData[i] + rhs.matrixData[i];
+        if ((lhs.nRows != rhs.nRows) || (lhs.nCols != rhs.nCols)) {
+            throw std::invalid_argument("Dimensions do not match.");
+        }
 
-        Matrix<T> newMatrix(numRows, numCols, tempData);
-        delete [] tempData;
+        Matrix<T> newMatrix(lhs.nRows, lhs.nCols);
+        
+        for (int i = 0; i < lhs.nRows; i++)
+            for (int j = 0; j < lhs.nCols; j++) {
+                T sum = lhs.get_element(i, j) + rhs.get_element(i, j);
+                newMatrix.set_element(i, j, sum);
+            }
+
         return newMatrix;
     }
 
@@ -251,15 +482,14 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> operator+(const T& lhs, const Matrix<T>& rhs) {
-        int numRows = rhs.nRows;
-        int numCols = rhs.nCols;
-        int numElements = numRows*numCols;
-        T *tempData = new T[numElements];
-        for (int i = 0; i < numElements; i++)
-            tempData[i] = lhs + rhs.matrixData[i];
+        Matrix<T> newMatrix(rhs.nRows, rhs.nCols);
         
-        Matrix<T> newMatrix(numRows, numCols, tempData);
-        delete[] tempData;
+        for (int i = 0; i < rhs.nRows; i++)
+            for (int j = 0; j < rhs.nCols; j++) {
+                T sum = lhs + rhs.get_element(i, j);
+                newMatrix.set_element(i, j, sum);
+            }
+
         return newMatrix;
     }
 
@@ -269,15 +499,14 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> operator+(const Matrix<T>& lhs, const T& rhs) {
-        int numRows = lhs.nRows;
-        int numCols = lhs.nCols;
-        int numElements = numRows*numCols;
-        T *tempData = new T[numElements];
-        for (int i = 0; i < numElements; i++)
-            tempData[i] = lhs.matrixData[i] + rhs;
+        Matrix<T> newMatrix(lhs.nRows, lhs.nCols);
         
-        Matrix<T> newMatrix(numRows, numCols, tempData);
-        delete[] tempData;
+        for (int i = 0; i < lhs.nRows; i++)
+            for (int j = 0; j < lhs.nCols; j++) {
+                T sum = lhs.get_element(i, j) + rhs;
+                newMatrix.set_element(i, j, sum);
+            }
+
         return newMatrix;
     }
 
@@ -290,15 +519,18 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> operator-(const Matrix<T>& lhs, const Matrix<T>& rhs) {
-        int numRows = lhs.nRows;
-        int numCols = lhs.nCols;
-        int numElements = numRows*numCols;
-        T *tempData = new T[numElements];
-        for (int i = 0; i < numElements; i++)
-            tempData[i] = lhs.matrixData[i] - rhs.matrixData[i];
+        if ((lhs.nRows != rhs.nRows) || (lhs.nCols != rhs.nCols)) {
+            throw std::invalid_argument("Dimensions do not match.");
+        }
+        
+        Matrix<T> newMatrix(lhs.nRows, lhs.nCols);
+        
+        for (int i = 0; i < lhs.nRows; i++)
+            for (int j = 0; j < lhs.nCols; j++) {
+                T sum = lhs.get_element(i, j) - rhs.get_element(i, j);
+                newMatrix.set_element(i, j, sum);
+            }
 
-        Matrix<T> newMatrix(numRows, numCols, tempData);
-        delete [] tempData;
         return newMatrix;
     }
 
@@ -308,15 +540,14 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> operator-(const T& lhs, const Matrix<T>& rhs) {
-        int numRows = rhs.nRows;
-        int numCols = rhs.nCols;
-        int numElements = numRows*numCols;
-        T *tempData = new T[numElements];
-        for (int i = 0; i < numElements; i++)
-            tempData[i] = lhs - rhs.matrixData[i];
+        Matrix<T> newMatrix(rhs.nRows, rhs.nCols);
         
-        Matrix<T> newMatrix(numRows, numCols, tempData);
-        delete[] tempData;
+        for (int i = 0; i < rhs.nRows; i++)
+            for (int j = 0; j < rhs.nCols; j++) {
+                T sum = lhs - rhs.get_element(i, j);
+                newMatrix.set_element(i, j, sum);
+            }
+
         return newMatrix;
     }
 
@@ -326,15 +557,14 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> operator-(const Matrix<T>& lhs, const T& rhs) {
-        int numRows = lhs.nRows;
-        int numCols = lhs.nCols;
-        int numElements = numRows*numCols;
-        T *tempData = new T[numElements];
-        for (int i = 0; i < numElements; i++)
-            tempData[i] = lhs.matrixData[i] - rhs;
+        Matrix<T> newMatrix(lhs.nRows, lhs.nCols);
         
-        Matrix<T> newMatrix(numRows, numCols, tempData);
-        delete[] tempData;
+        for (int i = 0; i < lhs.nRows; i++)
+            for (int j = 0; j < lhs.nCols; j++) {
+                T sum = lhs.get_element(i, j) - rhs;
+                newMatrix.set_element(i, j, sum);
+            }
+
         return newMatrix;
     }
 
@@ -353,37 +583,18 @@ namespace AMathEngine {
         int RnumCols = rhs.nCols;
 
         if (LnumCols == RnumRows) {
-            T* tempData = new T[LnumRows*RnumCols];
+            Matrix<T> newMatrix(LnumRows, RnumCols);
 
-            /* figure out issue later*/
-            // for (int i = 0; i < LnumRows; i++) {
-            //     Vector<T> aRow = get_row_vector(lhs, i);
-            //     for (int j = 0; j < RnumCols; j++) {
-            //         Vector<T> bCol = get_column_vector(rhs, j);
-            //         int index = lhs.get_linear_index(i, j);
-            //         tempData[index] = dot(aRow, bCol);
-            //     }
-            // }
-
-            // Loop through each Row of the lhs
-            for (int LRow = 0; LRow < LnumRows; LRow++) {
-                // Loop through each Column of the rhs
-                for (int RCol = 0; RCol < RnumCols; RCol++) {
-                    T elementSum = 0.0;
-                    // Loop through each element of this lhs row
-                    for (int LCol = 0; LCol < LnumCols; LCol++) {
-                        int LIndex = (LRow * LnumCols) + LCol;
-                        int RIndex = (LCol * RnumCols) + RCol;
-
-                        elementSum += (lhs.matrixData[LIndex] * rhs.matrixData[RIndex]);
-                    }
-                    int resultIndex = (LRow*RnumCols) + RCol;
-                    tempData[resultIndex] = elementSum;
+            for (int i = 0; i < LnumRows; i++) {
+                for (int j = 0; j < RnumCols; j++) {
+                    Vector<T> rowVector = lhs.get_row_vector(i);
+                    Vector<T> colVector = rhs.get_column_vector(j);
+                    T sum = dot(rowVector, colVector);
+                    newMatrix.set_element(i, j, sum);
                 }
             }
-            Matrix<T> Result(LnumRows, RnumCols, tempData);
-            delete[] tempData;
-            return Result;
+
+            return newMatrix;
         } else {
             return Matrix<T>(1, 1); // return 1x1 Matrix
         }
@@ -395,15 +606,14 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> operator*(const T& lhs, const Matrix<T>& rhs) {
-        int numRows = rhs.nRows;
-        int numCols = rhs.nCols;
-        int numElements = numRows*numCols;
-        T *tempData = new T[numElements];
-        for (int i = 0; i < numElements; i++)
-            tempData[i] = lhs*rhs.matrixData[i];
+        Matrix<T> newMatrix(rhs.nRows, rhs.nCols);
         
-        Matrix<T> newMatrix(numRows, numCols, tempData);
-        delete[] tempData;
+        for (int i = 0; i < rhs.nRows; i++)
+            for (int j = 0; j < rhs.nCols; j++) {
+                T sum = lhs * rhs.get_element(i, j);
+                newMatrix.set_element(i, j, sum);
+            }
+
         return newMatrix;
     }
 
@@ -413,16 +623,38 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> operator*(const Matrix<T>& lhs, const T& rhs) {
-        int numRows = lhs.nRows;
-        int numCols = lhs.nCols;
-        int numElements = numRows*numCols;
-        T *tempData = new T[numElements];
-        for (int i = 0; i < numElements; i++)
-            tempData[i] = lhs.matrixData[i]*rhs;
+        Matrix<T> newMatrix(lhs.nRows, lhs.nCols);
         
-        Matrix<T> newMatrix(numRows, numCols, tempData);
-        delete[] tempData;
+        for (int i = 0; i < lhs.nRows; i++)
+            for (int j = 0; j < lhs.nCols; j++) {
+                T sum = lhs.get_element(i, j) * rhs;
+                newMatrix.set_element(i, j, sum);
+            }
+
         return newMatrix;
+    }
+
+    /* Matrix & Vector Multiplication: Matrix*Vector
+     * @param Matrix Object, Vector Object
+     * @return Vector of product sum
+    */
+    template <class T>
+    Vector<T> operator*(const Matrix<T>& lhs, const Vector<T>& rhs) {
+        if (lhs.nCols != rhs.get_length()) {
+            throw std::invalid_argument("Number of Columns in Matrix must equal number of rows in vector.");
+        }
+        Vector<T> newVec(lhs.nRows);
+
+        for (int i = 0; i < lhs.nRows; i++) {
+            T sum = 0.0;
+            for (int j = 0; j < lhs.nCols; j++) {
+                sum += lhs.get_element(i, j) * rhs[j];
+            }
+            newVec[i] = sum;
+        }
+        return (
+            newVec
+        );
     }
 
     /******************************************************
@@ -446,177 +678,6 @@ namespace AMathEngine {
     */
     template <class T>
     bool Matrix<T>::is_square() const { return nRows == nCols; }
-
-    /******************************************************
-                    Calculations/Artithmetic
-    ******************************************************/
-    /* Calculate Determinant of Matrix
-     * @param Matrix Object
-     * @return determinant value
-    */
-    template <class T>
-    T determinant(const Matrix<T>& A) {
-        T det;
-        if (A.get_num_rows() == 2 && A.get_num_cols() == 2) {
-            return (
-                A.get_element(0, 0)*A.get_element(1, 1)
-                - A.get_element(1, 0)*A.get_element(0, 1)
-            );
-        }
-        if (A.get_num_rows() == A.get_num_cols()) {
-            for (int i = 0; i < A.get_num_cols(); i++) {
-                Matrix<T> tempMatrix = get_submatrix(A, i);
-                if (i%2 == 0) {
-                    det += A.get_element(0, i)*(determinant(tempMatrix));
-                } else {
-                    det -= A.get_element(0, i)*(determinant(tempMatrix));
-                }
-            }
-        }
-        return det;
-    }
-
-    /* Transpose Matrix
-     * @param Matrix Object
-     * @return Transpose Matrix
-    */
-    template <class T>
-    Matrix<T> transpose(const Matrix<T>& A) {
-        int newRows = A.get_num_cols();
-        int newCols = A.get_num_rows();
-        int length = newRows * newCols;
-        T* newData = new T[length];
-
-        for (int i = 0; i < length; i++) {
-            int currRow = (i/newCols);
-            int currCol = (i%newCols);
-            newData[i] = A.get_element(currCol, currRow);
-        }
-
-        return (
-            Matrix<T>(
-                newRows, newCols, newData
-            )
-        );
-    }
-
-    /* Adjacent Matrix
-     *  - Used to find Inverse Matrix
-     * @param Matrix Object
-     * @return Adjacent Matrix
-    */
-    template <class T>
-    Matrix<T> adjacent(const Matrix<T>& A) {
-        Matrix<T> AT = transpose(A);
-        int newRows = A.get_num_rows();
-        int newCols = A.get_num_cols();
-        int newElements = newRows*newCols;
-        T* newData = new T[newElements];
-
-        for (int i = 0; i < newElements; i++) {
-            Matrix<T> subMatrix = get_submatrix(A, i);
-            T det = determinant(subMatrix);
-            if (i%2 == 0) newData[i] = det;
-            else newData[i] = -1*det;
-        }
-
-        return (
-            Matrix<T>(
-                newRows, newCols, newData
-            )
-        );
-    }
-
-    /* Inverse Matrix
-     * @param Matrix Object
-     * @return Inverse Matrix
-    */
-    template <class T>
-    Matrix<T> inverse(const Matrix<T>& A) {
-        T det = determinant(A);
-        if (A.is_square() && det != 0)  {
-            Matrix<T> Adj = adjacent(A);
-            Matrix<T> Inv = (1/det)*Adj;
-
-            return (
-                Inv
-            );
-        } else {
-            return (
-                Matrix<T>(1)
-            );
-        }
-    }
-
-    /******************************************************
-                        Helper Functions
-    ******************************************************/
-    /* Return Vector with column vector values
-     * @param Matrix Object, column value
-     * @return Column Vector Object
-    */
-    template <class T>
-    Vector<T> get_column_vector(Matrix<T>& A, int column) {
-        int numRows = A.get_num_rows();
-
-        T* newData = new T[numRows];
-
-        for (int i = 0; i < numRows; i++)
-            newData[i] = A.get_element(i, column);
-        
-        return (
-            Vector<T>(numRows, newData)
-        );
-    }
-
-    /* Return Vector with row vector value
-     * @param Matrix Object, row value
-     * @return Row Vector Object
-    */
-    template <class T>
-    Vector<T> get_row_vector(Matrix<T>& A, int row) {
-        int numCols = A.get_num_cols();
-
-        T* newData = new T[numCols];
-
-        for (int i = 0; i < numCols; i++)
-            newData[i] = A.get_element(row, i);
-        
-        return (
-            Vector<T>(numCols, newData)
-        );
-    }
-
-    /* Return SubMatrix of Matrix with given index
-     *  - Used to calculate Determinant
-     * @param Matrix Object, index value
-     * @return SubMatrix
-    */
-    template <class T>
-    Matrix<T> get_submatrix(const Matrix<T>& A, int index) {
-        int newRows = A.get_num_rows() - 1;
-        int newCols = A.get_num_cols() - 1;
-        int newLength = newRows * newCols;
-        T* newData = new T[newLength];
-
-        int rowIgnore = (index/A.get_num_cols());
-        int colIgnore = (index%A.get_num_cols());
-        int indexCount = 0;
-        for (int i = 0; i < (A.get_num_rows()*A.get_num_cols()); i++) {
-            int currentRow = (i/A.get_num_cols());
-            int currentCol = (i%A.get_num_cols());
-            if ((currentRow != rowIgnore) && (currentCol != colIgnore)) {
-                newData[indexCount] = A.get_element(currentRow, currentCol);
-                indexCount++;
-            }
-        }
-
-        return (
-            Matrix<T>(
-                newRows, newCols, newData
-            )
-        );
-    }
 
     template class Matrix<float>;
 }

@@ -30,28 +30,28 @@ namespace AMathEngine {
      * @param Vector Object
     */
     template <class T>
-    Vector3D<T>::Vector3D(const Vector3D& a) {
-        length = a.length;
-        data = new T[length];
-        data[0] = a.data[0];
-        data[1] = a.data[1];
-        data[2] = a.data[2];
+    Vector3D<T>::Vector3D(const Vector3D& inputVector) {
+        this->length = inputVector.length;
+        this->data = new T[this->length];
+        this->data[0] = inputVector.data[0];
+        this->data[1] = inputVector.data[1];
+        this->data[2] = inputVector.data[2];
     }
 
     /* Move Constructor 
      * @param Vector Object
     */
     template <class T>
-    Vector3D<T>::Vector3D(Vector3D<T>&& a) {
-        length = a.length;
-        data = new T[length];
-        data[0] = a.data[0];
-        data[1] = a.data[1];
-        data[2] = a.data[2];
+    Vector3D<T>::Vector3D(Vector3D<T>&& inputVector) {
+        this->length = inputVector.length;
+        this->data = new T[this->length];
+        this->data[0] = inputVector.data[0];
+        this->data[1] = inputVector.data[1];
+        this->data[2] = inputVector.data[2];
 
-        delete[] a.data;
-        a.data = nullptr;
-        a.length = 0;
+        delete[] inputVector.data;
+        inputVector.data = nullptr;
+        inputVector.length = 0;
     }
 
     /* Destructor */
@@ -73,12 +73,12 @@ namespace AMathEngine {
      * @return new Vector Object
     */
     template <class T>
-    Vector3D<T> cross(const Vector3D<T>& a, const Vector3D<T>& b) {
+    Vector3D<T> cross(const Vector3D<T>& lhs.data, const Vector3D<T>& rhs.data) {
         return (
             Vector3D<T>(
-                a[1]*b[2] - a[2]*b[1],
-                a[2]*b[0] - a[0]*b[2],
-                a[0]*b[1] - a[1]*b[0]
+                lhs.data[1]*rhs.data[2] - lhs.data[2]*rhs.data[1],
+                -1*(lhs.data[0]*rhs.data[2] - lhs.data[2]*rhs.data[0]),
+                lhs.data[0]*rhs.data[1] - lhs.data[1]*rhs.data[0]
             )
         );
     }

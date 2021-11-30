@@ -39,26 +39,26 @@ namespace AMathEngine {
      * @param Vector Object
     */
     template <class T>
-    Vector<T>::Vector(const Vector<T>& a) : length{a.length} {
-        data = new T[length];
+    Vector<T>::Vector(const Vector<T>& inputVector) : length{inputVector.length} {
+        this->data = new T[this->length];
         for (int i = 0; i < length; i++)
-            data[i] = a.data[i];
+            this->data[i] = inputVector.data[i];
     }
 
     /* Move Constructor 
      * @param Vector Object
     */
    template <class T>
-    Vector<T>::Vector(Vector<T>&& a) {
-        length = a.length;
-        data = new T[length];
+    Vector<T>::Vector(Vector<T>&& inputVector) {
+        this->length = inputVector.length;
+        this->data = new T[this->length];
 
-        for (int i = 0; i < length; i++)
-            data[i] = a.data[i];
+        for (int i = 0; i < this->length; i++)
+            this->data[i] = inputVector.data[i];
         
-        delete[] a.data;
-        a.data = nullptr;
-        a.length = 0;
+        delete[] inputVector.data;
+        inputVector.data = nullptr;
+        inputVector.length = 0;
     }
 
     /* Destructor */
@@ -108,22 +108,90 @@ namespace AMathEngine {
     }
 
     /******************************************************
+                    Functions to Computate
+    ******************************************************/
+    /* Vector Magnitude
+     * @param None
+     * @return Magnitude of Current Vector
+    */
+    template <class T>
+    T Vector<T>::magnitude() const {
+        T sum = 0.0;
+        for (int i = 0; i < length; i++) {
+            sum += data[i]*data[i];
+        }
+        return (
+            sqrt(sum)
+        );
+    }
+    
+    /* Copy of Normalized Vector
+     * @param None
+     * @return Normalize Vector
+    */
+    template <class T>
+    Vector<T> Vector<T>::normalized() const {
+        T mag = magnitude();
+        mag = 1.0/mag;
+
+        Vector<T> newVec(this->length);
+        for (int i = 0; i < this->length; i++)
+            newVec[i] = this->data[i] * mag;
+        
+        return (
+            newVec
+        );
+    }
+
+    /* Set Vector to Normalized Vector
+     * @param None
+     * @return None
+    */
+    template <class T>
+    void Vector<T>::normalize() {
+        T mag = magnitude();
+        mag = 1.0/mag;
+
+        for (int i = 0; i < length; i++)
+            data[i] = data[i]*mag;
+    }
+
+    /******************************************************
                   Overloaded Operators Functions
     ******************************************************/
+    /* Overloaded (==) equal to Operator
+     * @param Vector Object
+     * @return boolean result of Vector compare
+    */
+    template <class T>
+    bool Vector<T>::operator==(const Vector<T>& rhs) {
+        // Check if the matrices are the same dimension, if not return false
+        if (this->length != rhs.length)
+            return false;
+        
+        // Check if elements are equal
+        bool flag = true;
+        for (int i = 0; i < this->length; i++) {
+            if (this->data[i] != rhs.data[i])
+                flag = false;
+        }
+        return flag;
+    }
 
     /* Copy assignment operator 
      * @param Vector Object
      * @return Current Vector Object
     */
     template <class T>
-    Vector<T>& Vector<T>::operator=(const Vector<T>& a) {
-        if (this != &a)
+    Vector<T>& Vector<T>::operator=(const Vector<T>& rhs) {
+        if (this != &rhs)
         {
-            length = a.length;
-            delete[] data;
-            data = new T[length];
-            for (int i = 0; i < length; i++)
-                data[i] = a.data[i];
+            this->length = rhs.length;
+            delete[] this->data;
+            this->data = new T[this->length];
+
+            for (int i = 0; i < this->length; i++)
+                this->data[i] = rhs.data[i];
       }
       return (*this);
     }
@@ -133,19 +201,19 @@ namespace AMathEngine {
      * @return Current Vector Object
     */
     template <class T>
-    Vector<T>& Vector<T>::operator=(Vector<T>&& a) {
-        if (this != &a)
+    Vector<T>& Vector<T>::operator=(Vector<T>&& rhs) {
+        if (this != &rhs)
         {            
-            length = a.length;
-            delete[] data;
-            data = new T[length];
+            this->length = rhs.length;
+            delete[] this->data;
+            this->data = new T[this->length];
 
-            for (int i = 0; i < length; i++)
-                data[i] = a.data[i];
+            for (int i = 0; i < this->length; i++)
+                this->data[i] = rhs.data[i];
             
-            delete[] a.data;
-            a.data = nullptr;
-            a.length = 0;
+            delete[] rhs.data;
+            rhs.data = nullptr;
+            rhs.length = 0;
         }
         return (*this);
     }
@@ -168,9 +236,13 @@ namespace AMathEngine {
      * @return Current Vector Object
     */
     template <class T>
-    Vector<T>& Vector<T>::operator+=(const Vector<T>& a) {
-        for (int i = 0; i < length; i++) {
-            data[i] += a[i];
+    Vector<T>& Vector<T>::operator+=(const Vector<T>& rhs) {
+        if (this->length != rhs.length) {
+            throw std::invalid_argument("Number of rows in current Vector must equal rows in Vector 'a'.");
+        }
+
+        for (int i = 0; i < this->length; i++) {
+            this->data[i] += rhs.data[i];
         }
         return (*this);
     }
@@ -180,9 +252,13 @@ namespace AMathEngine {
      * @return Current Vector Object
     */
     template <class T>
-    Vector<T>& Vector<T>::operator-=(const Vector<T>& a) {
-        for (int i = 0; i < length; i++) {
-            data[i] -= a[i];
+    Vector<T>& Vector<T>::operator-=(const Vector<T>& rhs) {
+        if (this->length != rhs.length) {
+            throw std::invalid_argument("Number of rows in current Vector must equal rows in Vector 'a'.");
+        }
+
+        for (int i = 0; i < this->length; i++) {
+            this->data[i] -= rhs.data[i];
         }
         return (*this);
     }
@@ -211,15 +287,28 @@ namespace AMathEngine {
     */
     template <class T>
     Vector<T> operator*(const Vector<T>& a, float s) {
-        T* newData = new T[a.length];
-        int newLength = a.length;
+        Vector<T> newVec(a.length);
 
-        for (int i = 0; i < newLength; i++) {
-            newData[i] = a[i]*s;
+        for (int i = 0; i < a.length; i++) {
+            newVec.data[i] = a.data[i]*s;
         }
 
-        Vector<T> newVec (newLength, newData);
-        delete[] newData;
+        return(
+            newVec
+        );
+    }
+
+    /* Vector Scalar Multiplication
+     * @param Scalar Value, Vector Object
+     * @return new Vector Object
+    */
+    template <class T>
+    Vector<T> operator*(float s, const Vector<T>& a) {
+        Vector<T> newVec(a.length);
+
+        for (int i = 0; i < a.length; i++) {
+            newVec.data[i] = a.data[i]*s;
+        }
 
         return(
             newVec
@@ -231,16 +320,16 @@ namespace AMathEngine {
      * @return new Vector Object
     */
     template <class T>
-    Vector<T> operator+(const Vector<T>& a, const Vector<T>& b) {
-        T* newData = new T[a.length];
-        int newLength = a.length;
-
-        for (int i = 0; i < newLength; i++) {
-            newData[i] = a[i]+b[i];
+    Vector<T> operator+(const Vector<T>& lhs, const Vector<T>& rhs) {
+        if (lhs.length != rhs.length) {
+            throw std::invalid_argument("Number of rows in Vector 'a' must equal rows in Vector 'b'.");
         }
 
-        Vector<T> newVec (newLength, newData);
-        delete[] newData;
+        Vector<T> newVec(lhs.length);
+
+        for (int i = 0; i < lhs.length; i++) {
+            newVec.data[i] = lhs.data[i]+rhs.data[i];
+        }
         
         return(
             newVec
@@ -252,16 +341,16 @@ namespace AMathEngine {
      * @return new Vector Object
     */
     template <class T>
-    Vector<T> operator-(const Vector<T>& a, const Vector<T>& b) {
-        T* newData = new T[a.length];
-        int newLength = a.length;
-
-        for (int i = 0; i < newLength; i++) {
-            newData[i] = a[i]-b[i];
+    Vector<T> operator-(const Vector<T>& lhs, const Vector<T>& rhs) {
+        if (lhs.length != rhs.length) {
+            throw std::invalid_argument("Number of rows in Vector 'a' must equal rows in Vector 'b'.");
         }
 
-        Vector<T> newVec (newLength, newData);
-        delete[] newData;
+        Vector<T> newVec(lhs.length);
+
+        for (int i = 0; i < lhs.length; i++) {
+            newVec.data[i] = lhs.data[i]-rhs.data[i];
+        }
         
         return(
             newVec
@@ -277,31 +366,18 @@ namespace AMathEngine {
      * @return sum of vector product
     */
     template <class T>
-    T dot(const Vector<T>& a, const Vector<T>& b) {
-        int len = a.get_length();
+    T dot(const Vector<T>& lhs, const Vector<T>& rhs) {
+        if (lhs.length != rhs.length) {
+            throw std::invalid_argument("Number of rows in Vector 'a' must equal rows in Vector 'b'.");
+        }
+
+        int len = lhs.get_length();
         T sum = 0;
 
         for (int i = 0; i < len; i++) {
-            sum += a[i]*b[i];
+            sum += lhs[i]*rhs[i];
         }
         return sum;
-    }
-
-    /* Vector Magnitude
-     *  - 1) Find the sum of each element squared
-     *  - 2) Return Square Root of Sum
-     * @param Vector Object
-     * @return magnitude of Vector
-    */
-    template <class T>
-    T magnitude(const Vector<T>& a) {
-        int len = a.get_length();
-        T sum = 0;
-
-        for (int i = 0; i < len; i++) {
-            sum += (a[i]*a[i]);
-        }
-        return sqrt(sum);
     }
 
     /* Find Angle
@@ -315,34 +391,14 @@ namespace AMathEngine {
      * @return Angle between Vectors
     */
     template <class T>
-    T find_angle(const Vector<T>& a, const Vector<T>& b) {
-        T dotAB = dot(a, b);
-        T magA = magnitude(a);
-        T magB = magnitude(b);
+    T find_angle(const Vector<T>& lhs, const Vector<T>& rhs) {
+        T dotAB = dot(lhs, rhs);
+        T magA = magnitude(lhs);
+        T magB = magnitude(rhs);
         T quot = dotAB/(magA*magB);
 
         return (
             acos(quot) * (180/M_PI)
-        );
-    }
-
-    /* Normalize Vector
-     *  - Multiply vector by 1 over the vector magnitude
-     * @param Vector Object
-     * @return Normalized Vector
-    */
-    template <class T>
-    Vector<T> normalize(const Vector<T>& a) {
-        T mag = 1.0f/magnitude(a);
-
-        int newLength = a.length;
-        T* newData = new T[newLength];
-    
-        for (int i = 0; i < a.length; i++)
-            newData[i] = a[i]*mag;
-
-        return (
-            Vector<T>(a.length, newData)
         );
     }
 
