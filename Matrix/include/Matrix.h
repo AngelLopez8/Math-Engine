@@ -76,9 +76,12 @@ namespace AMathEngine {
             template <class U> friend Matrix<U> operator*(const Matrix<U>& lhs, const U& rhs);  // Matrix * Scalar    
             template <class U> friend Vector<U> operator*(const Matrix<U>& lhs, const Vector<U>& rhs);  // Matrix * Vector    
 
+            /***************************** Helper Functions *****************************/
+            bool is_square() const;   // Check if Square Matrix
+            bool is_row_echelon() const;    // Check if Matrix is in Row Echelon Form
+    
         private:
             int get_linear_index(int row, int col) const; // Calculate index with given row and col
-            bool is_square() const;   // Check if Square Matrix
     };
 }
 

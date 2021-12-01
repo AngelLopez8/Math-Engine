@@ -87,7 +87,7 @@ namespace AMathEngine {
     */
     template <class T>
     bool Matrix<T>::resize(int numRows, int numCols) {
-        if ((numRow <= 0) || (numCols <= 0))
+        if ((numRows <= 0) || (numCols <= 0))
             return false;
         nRows = numRows;
         nCols = numCols;
@@ -258,17 +258,14 @@ namespace AMathEngine {
     */
     template <class T>
     Matrix<T> Matrix<T>::transposed() const {
-        T* newData = new T[nElements];
+        Matrix<T> newMatrix(nCols, nRows);
 
-        for (int i = 0; i < nElements; i++) {
-            int currRow = (i/nRows);
-            int currCol = (i%nRows);
-
-            newData[i] = get_element(currCol, currRow);
+        for (int i = 0; i < nRows; i++) {
+            for (int j = 0; j < nCols; j++) {
+                T temp = get_element(j, i);
+                newMatrix.set_element(i, j, temp);
+            }
         }
-
-        Matrix<T> newMatrix(nCols, nRows, newData);
-        delete[] newData;
 
         return (
             newMatrix
@@ -658,6 +655,32 @@ namespace AMathEngine {
     }
 
     /******************************************************
+                        Helper Functions
+    ******************************************************/
+    /* Check if Matrix is a Square Matrix
+     * @param None
+     * @return boolean result
+    */
+    template <class T>
+    bool Matrix<T>::is_square() const { return nRows == nCols; }
+
+    /* Check if Matrix is in Row Echelon Form
+     * @param None
+     * @return boolean result
+    */
+    template <class T>
+    bool Matrix<T>::is_row_echelon() const {
+        T sum = 0.0;
+        for (int i = 0; i < nRows; i++) {
+            for (int j = 0; j < i; j++) {
+                sum += this->get_element(i, j);
+            }
+        }
+        std::cout << sum << "\n";
+        return sum == 0.0;
+    }
+
+    /******************************************************
                         Private Functions
     ******************************************************/
     /* Calculate Linear Index with given row and column
@@ -671,13 +694,6 @@ namespace AMathEngine {
         else
             return -1;
     }
-
-    /* Check if Matrix is a Square Matrix
-     * @param None
-     * @return boolean result
-    */
-    template <class T>
-    bool Matrix<T>::is_square() const { return nRows == nCols; }
 
     template class Matrix<float>;
 }
